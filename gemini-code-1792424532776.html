@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tvarkaraštis</title>
+    <style>
+        :root {
+            --bg-color: #090a0f;
+            --card-bg: #12141c;
+            --card-border: #232736;
+            --accent-purple: #5b21b6;
+            --accent-purple-light: #7c3aed;
+            --today-bg: #2e1065;
+            --today-border: #7c3aed;
+            --past-day: #0f1118;
+            --past-text: #4b5563;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --status-color: #10b981; /* Default online green */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+        }
+
+        /* Шапка */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--card-border);
+            margin-bottom: 30px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        h1.site-title {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            background: linear-gradient(135deg, #ffffff 0%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Индикатор статуса */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #d1d5db;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--status-color);
+            box-shadow: 0 0 10px var(--status-color);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .rules-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            background-color: rgba(124, 58, 237, 0.15);
+            color: #c4b5fd;
+            border: 1px solid var(--accent-purple-light);
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .rules-btn:hover {
+            background-color: var(--accent-purple-light);
+            color: #ffffff;
+            box-shadow: 0 0 15px rgba(124, 58, 237, 0.4);
+        }
+
+        /* Заголовки */
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 18px;
+            background-color: var(--accent-purple-light);
+            border-radius: 2px;
+        }
+
+        /* Краткое расписание на 5 дней */
+        .weekly-box {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 35px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .weekly-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .weekly-item {
+            padding: 12px 16px;
+            background-color: rgba(255, 255, 255, 0.02);
+            border-left: 3px solid var(--accent-purple-light);
+            border-radius: 4px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .day-name {
+            font-weight: 700;
+            color: #c4b5fd;
+            margin-right: 8px;
+        }
+
+        /* Календарь */
+        .calendar-box {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 35px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .month-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #f3f4f6;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .weekday-label {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            padding-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .day-card {
+            min-height: 90px;
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .day-card:hover {
+            border-color: var(--accent-purple-light);
+            transform: translateY(-2px);
+        }
+
+        .day-card.past {
+            background-color: var(--past-day);
+            border-color: #181b24;
+            color: var(--past-text);
+            opacity: 0.5;
+        }
+
+        .day-card.today {
+            background-color: var(--today-bg);
+            border: 1px solid var(--today-border);
+            box-shadow: 0 0 15px rgba(124, 58, 237, 0.25);
+        }
+
+        .day-card.today .day-number {
+            color: #c4b5fd;
+            font-weight: bold;
+        }
+
+        .day-number {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .day-events {
+            font-size: 0.75rem;
+            color: #d1d5db;
+            margin-top: 4px;
+            word-break: break-word;
+            line-height: 1.2;
+            overflow: hidden;
+            max-height: 40px;
+        }
+
+        /* Подвал */
+        footer {
+            margin-top: auto;
+            padding-top: 25px;
+            border-top: 1px solid var(--card-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .admin-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .admin-link {
+            color: #374151;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: color 0.2s ease;
+        }
+
+        .admin-link:hover, .admin-link.active-admin {
+            color: var(--accent-purple-light);
+        }
+
+        /* Модальные окна */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            max-width: 450px;
+            width: 100%;
+            padding: 25px;
+        }
+
+        .modal-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 10px;
+            background: #090a0f;
+            border: 1px solid var(--card-border);
+            border-radius: 6px;
+            color: #fff;
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: opacity 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--accent-purple-light);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #272a38;
+            color: white;
+            margin-left: 10px;
+        }
+
+        .btn:hover { opacity: 0.9; }
+
+        .view-details {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #e5e7eb;
+            white-space: pre-wrap;
+            margin-bottom: 20px;
+            background: rgba(255,255,255,0.03);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Шапка -->
+        <header>
+            <div class="logo-area">
+                <h1 class="site-title">Tvarkaraštis</h1>
+                <div class="status-badge">
+                    <span class="status-dot" id="statusDot"></span>
+                    <span id="statusText">Online</span>
+                </div>
+            </div>
+            <a href="#" id="rulesBtn" class="rules-btn" target="_blank">Taisyklės</a>
+        </header>
+
+        <!-- Краткое расписание на 5 дней -->
+        <div class="section-title">Savaitės Tvarkaraštis</div>
+        <div class="weekly-box">
+            <ul class="weekly-list" id="weeklyList"></ul>
+        </div>
+
+        <!-- Календарь -->
+        <div class="section-title">Kalendorius</div>
+        <div class="calendar-box">
+            <div class="calendar-header">
+                <div class="month-title" id="monthTitle">Mėnuo</div>
+            </div>
+            <div class="calendar-grid" id="calendarGrid"></div>
+        </div>
+    </div>
+
+    <!-- Подвал -->
+    <footer>
+        <div>&copy; Tvarkaraštis</div>
+        <div class="admin-controls">
+            <a class="admin-link" id="settingsLink" onclick="openSettingsModal()" style="display:none;">Nustatymai</a>
+            <a class="admin-link" id="adminToggleLink" onclick="toggleAdmin()">Admin</a>
+        </div>
+    </footer>
+
+    <!-- Модальное окно Входа в Админку -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-title">Prisijungimas prie Admin</div>
+            <div class="form-group">
+                <label>Slaptažodis:</label>
+                <input type="password" id="adminPassInput" placeholder="Įveskite slaptažodį">
+            </div>
+            <button class="btn btn-primary" onclick="loginAdmin()">Prisijungti</button>
+            <button class="btn btn-secondary" onclick="closeModals()">Uždaryti</button>
+        </div>
+    </div>
+
+    <!-- Модальное окно Настройки -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content" style="max-height: 90vh; overflow-y: auto;">
+            <div class="modal-title">Nustatymai ir Savaitė</div>
+            
+            <div class="form-group">
+                <label>Jūsų Statuso Tekstas:</label>
+                <input type="text" id="editStatusText" placeholder="Pvz: Žaidžiu, Poilsis, Online...">
+            </div>
+            <div class="form-group">
+                <label>Statuso Spalva:</label>
+                <select id="editStatusColor">
+                    <option value="#10b981">Žalia (Online)</option>
+                    <option value="#ef4444">Raudona (Užsiėmęs)</option>
+                    <option value="#f59e0b">Geltona (Otošėl)</option>
+                    <option value="#8b5cf6">Violetinė (Poilsis)</option>
+                </select>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid var(--card-border); margin: 15px 0;">
+            <div class="form-group"><label>Taisyklių Mygtuko Pavadinimas:</label><input type="text" id="editRulesText"></div>
+            <div class="form-group"><label>Taisyklių PDF Nuoroda (URL):</label><input type="text" id="editRulesUrl"></div>
+            
+            <hr style="border: 0; border-top: 1px solid var(--card-border); margin: 15px 0;">
+            <div class="form-group"><label>Pirmadienis:</label><input type="text" id="editMon"></div>
+            <div class="form-group"><label>Antradienis:</label><input type="text" id="editTue"></div>
+            <div class="form-group"><label>Trečiadienis:</label><input type="text" id="editWed"></div>
+            <div class="form-group"><label>Ketvirtadienis:</label><input type="text" id="editThu"></div>
+            <div class="form-group"><label>Penktadienis:</label><input type="text" id="editFri"></div>
+            
+            <hr style="border: 0; border-top: 1px solid var(--card-border); margin: 15px 0;">
+            <div class="form-group"><label>Naujas Admin Slaptažodis:</label><input type="password" id="editNewPass" placeholder="Palikite tuščią"></div>
+            
+            <button class="btn btn-primary" onclick="saveSettings()">Išsaugoti</button>
+            <button class="btn btn-secondary" onclick="closeModals()">Uždaryti</button>
+        </div>
+    </div>
+
+    <!-- Модальное окно Просмотра/Редактирования дня -->
+    <div class="modal" id="dayModal">
+        <div class="modal-content">
+            <div class="modal-title" id="dayModalTitle">Diena</div>
+            
+            <div id="dayViewMode">
+                <div class="view-details" id="dayDetailsText"></div>
+                <button class="btn btn-primary" id="switchToEditBtn" onclick="switchToEditMode()" style="display:none;">Redaguoti</button>
+                <button class="btn btn-secondary" onclick="closeModals()">Uždaryti</button>
+            </div>
+
+            <div id="dayEditMode" style="display: none;">
+                <div class="form-group">
+                    <label>Aprašymas ir laikas:</label>
+                    <textarea id="dayEventInput" rows="5" placeholder="Įveskite informaciją..."></textarea>
+                </div>
+                <button class="btn btn-primary" onclick="saveDayEvent()">Išsaugoti</button>
+                <button class="btn btn-secondary" onclick="cancelEditMode()">Atšaukti</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const defaultData = {
+            rulesText: "Taisyklės",
+            rulesUrl: "#",
+            adminPass: "1234",
+            statusText: "Online",
+            statusColor: "#10b981",
+            weekly: {
+                mon: "zaidimas nmr 1: 8:05 - 9:35.",
+                tue: "zaidimas nmr 2: 8:05 - 9:35.",
+                wed: "zaidimas nmr 1: 8:05 - 8:40. zaidimas nmr 2: 10:36 - 10:56.",
+                thu: "zaidimas nmr 2: 8:05 - 8:40. zaidimas 1: 12:52 - 13:47.",
+                fri: "zaidimas nmr 1: 8:05 - 9:35. zaidimas nmr 2: 12:52 - 14:00."
+            },
+            calendarEvents: {}
+        };
+
+        let appData = JSON.parse(localStorage.getItem('myScheduleData')) || defaultData;
+        let isAdmin = false;
+        let currentEditingDateKey = '';
+        let currentDayNumber = 0;
+
+        function saveData() {
+            localStorage.setItem('myScheduleData', JSON.stringify(appData));
+            render();
+        }
+
+        function render() {
+            // Status
+            document.getElementById('statusText').innerText = appData.statusText || "Online";
+            document.documentElement.style.setProperty('--status-color', appData.statusColor || "#10b981");
+
+            // Rules
+            const rulesBtn = document.getElementById('rulesBtn');
+            rulesBtn.innerText = appData.rulesText || "Taisyklės";
+            rulesBtn.href = appData.rulesUrl || "#";
+
+            // Weekly
+            const weeklyList = document.getElementById('weeklyList');
+            const days = [
+                { name: 'Pirmadienis', val: appData.weekly.mon },
+                { name: 'Antradienis', val: appData.weekly.tue },
+                { name: 'Trečiadienis', val: appData.weekly.wed },
+                { name: 'Ketvirtadienis', val: appData.weekly.thu },
+                { name: 'Penktadienis', val: appData.weekly.fri }
+            ];
+
+            weeklyList.innerHTML = days.map(d => `
+                <li class="weekly-item">
+                    <span class="day-name">${d.name} --</span>${d.val}
+                </li>
+            `).join('');
+
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            const monthTitle = document.getElementById('monthTitle');
+            grid.innerHTML = '';
+
+            const weekLabels = ['Pr', 'Ant', 'Tr', 'Ket', 'Pen', 'Še', 'Se'];
+            weekLabels.forEach(w => {
+                grid.innerHTML += `<div class="weekday-label">${w}</div>`;
+            });
+
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            const today = now.getDate();
+
+            const monthNames = ["Sausis", "Vasaris", "Kovas", "Balandis", "Gegužė", "Birželis", "Liepa", "Rugpjūtis", "Rugsėjis", "Spalis", "Lapkritis", "Gruodis"];
+            monthTitle.innerText = `${monthNames[month]} ${year}`;
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            let startOffset = firstDay === 0 ? 6 : firstDay - 1;
+
+            for (let i = 0; i < startOffset; i++) {
+                grid.innerHTML += `<div></div>`;
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                let statusClass = '';
+                if (day < today) {
+                    statusClass = 'past';
+                } else if (day === today) {
+                    statusClass = 'today';
+                }
+
+                const mStr = String(month + 1).padStart(2, '0');
+                const dStr = String(day).padStart(2, '0');
+                const dateKey = `${year}-${mStr}-${dStr}`;
+
+                const eventText = appData.calendarEvents && appData.calendarEvents[dateKey] ? appData.calendarEvents[dateKey] : '';
+
+                grid.innerHTML += `
+                    <div class="day-card ${statusClass}" onclick="openDayModal('${dateKey}', ${day})">
+                        <span class="day-number">${day}</span>
+                        <div class="day-events">${eventText}</div>
+                    </div>
+                `;
+            }
+        }
+
+        function toggleAdmin() {
+            if (!isAdmin) {
+                document.getElementById('loginModal').style.display = 'flex';
+                document.getElementById('adminPassInput').value = '';
+            } else {
+                isAdmin = false;
+                document.body.classList.remove('admin-mode');
+                document.getElementById('adminToggleLink').innerText = 'Admin';
+                document.getElementById('adminToggleLink').classList.remove('active-admin');
+                document.getElementById('settingsLink').style.display = 'none';
+                alert('Atsijungėte iš admin režimo.');
+            }
+        }
+
+        function loginAdmin() {
+            const pass = document.getElementById('adminPassInput').value;
+            if (pass === appData.adminPass) {
+                isAdmin = true;
+                document.body.classList.add('admin-mode');
+                document.getElementById('adminToggleLink').innerText = 'Atsijungti';
+                document.getElementById('adminToggleLink').classList.add('active-admin');
+                document.getElementById('settingsLink').style.display = 'inline';
+                closeModals();
+                alert('Sėkmingai prisijungėte!');
+            } else {
+                alert('Neteisingas slaptažodis!');
+            }
+        }
+
+        function openSettingsModal() {
+            document.getElementById('editStatusText').value = appData.statusText || "Online";
+            document.getElementById('editStatusColor').value = appData.statusColor || "#10b981";
+            document.getElementById('editRulesText').value = appData.rulesText || "Taisyklės";
+            document.getElementById('editRulesUrl').value = appData.rulesUrl || "";
+            document.getElementById('editMon').value = appData.weekly.mon;
+            document.getElementById('editTue').value = appData.weekly.tue;
+            document.getElementById('editWed').value = appData.weekly.wed;
+            document.getElementById('editThu').value = appData.weekly.thu;
+            document.getElementById('editFri').value = appData.weekly.fri;
+            document.getElementById('editNewPass').value = '';
+            document.getElementById('settingsModal').style.display = 'flex';
+        }
+
+        function saveSettings() {
+            appData.statusText = document.getElementById('editStatusText').value;
+            appData.statusColor = document.getElementById('editStatusColor').value;
+            appData.rulesText = document.getElementById('editRulesText').value;
+            appData.rulesUrl = document.getElementById('editRulesUrl').value;
+            appData.weekly.mon = document.getElementById('editMon').value;
+            appData.weekly.tue = document.getElementById('editTue').value;
+            appData.weekly.wed = document.getElementById('editWed').value;
+            appData.weekly.thu = document.getElementById('editThu').value;
+            appData.weekly.fri = document.getElementById('editFri').value;
+
+            const newPass = document.getElementById('editNewPass').value;
+            if (newPass.trim() !== '') {
+                appData.adminPass = newPass;
+            }
+
+            saveData();
+            closeModals();
+            alert('Nustatymai išsaugoti!');
+        }
+
+        function openDayModal(dateKey, dayNumber) {
+            currentEditingDateKey = dateKey;
+            currentDayNumber = dayNumber;
+            
+            const eventText = (appData.calendarEvents && appData.calendarEvents[dateKey]) ? appData.calendarEvents[dateKey] : 'Šiai dienai įrašų kol kas nėra.';
+            
+            document.getElementById('dayModalTitle').innerText = `Diena: ${dayNumber}`;
+            document.getElementById('dayDetailsText').innerText = eventText;
+            
+            document.getElementById('dayViewMode').style.display = 'block';
+            document.getElementById('dayEditMode').style.display = 'none';
+            
+            const editBtn = document.getElementById('switchToEditBtn');
+            editBtn.style.display = isAdmin ? 'inline-block' : 'none';
+
+            document.getElementById('dayModal').style.display = 'flex';
+        }
+
+        function switchToEditMode() {
+            document.getElementById('dayViewMode').style.display = 'none';
+            document.getElementById('dayEditMode').style.display = 'block';
+            document.getElementById('dayEventInput').value = (appData.calendarEvents && appData.calendarEvents[currentEditingDateKey]) ? appData.calendarEvents[currentEditingDateKey] : '';
+        }
+
+        function cancelEditMode() {
+            openDayModal(currentEditingDateKey, currentDayNumber);
+        }
+
+        function saveDayEvent() {
+            const text = document.getElementById('dayEventInput').value;
+            if (!appData.calendarEvents) {
+                appData.calendarEvents = {};
+            }
+            if (text.trim() === '') {
+                delete appData.calendarEvents[currentEditingDateKey];
+            } else {
+                appData.calendarEvents[currentEditingDateKey] = text;
+            }
+            saveData();
+            closeModals();
+        }
+
+        function closeModals() {
+            document.getElementById('loginModal').style.display = 'none';
+            document.getElementById('settingsModal').style.display = 'none';
+            document.getElementById('dayModal').style.display = 'none';
+        }
+
+        render();
+    </script>
+</body>
+</html>
